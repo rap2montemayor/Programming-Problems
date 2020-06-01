@@ -1,3 +1,0 @@
-#!/bin/bash
-g++ $1.cpp -o $1 -O2 -fsanitize=address,unknown -Wall -Wextra
-./$1 < input
