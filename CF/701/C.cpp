@@ -1,28 +1,41 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-map<char,int> firstIndex;
-string s; 
-
 int main() {
-    int n; cin>>n;
-    cin>>s;
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL); cout.tie(NULL);
 
-    int ans=100001;
-    for (pair<char, int> p : firstIndex) {
-        int l=p.second, r=p.second+1;
-        set<char> chars;
-        
-        chars.insert(s[l]);
-        while (r<n) {
-            chars.insert(s[r]);
-            if (chars.size()==firstIndex.size() and r-l+1 < ans) ans = r-l+1;
-            if (s[r] == s[l]) l++;
-            r++;
-        }
-    }
- 
-    if (lastIndex.size()==1) cout << 1 << endl;
-    else cout << ans << endl;
-    return 0;
+	int n; cin >> n;
+	string s; cin >> s;
+
+	// [l,r)
+	int l = 0, r = 0, pkmns;
+	set<char> letters;
+	for (char c : s)
+		letters.insert(c);
+	pkmns = letters.size();
+
+	int pokes = 0;
+	map<char, int> cnt;
+	while (r < s.size()) {
+		if (pokes == pkmns) break;
+		if (cnt[s[r]] == 0) ++pokes;
+		++cnt[s[r]];
+		++r;
+	}
+
+	int ans = r - l;
+	while (r <= s.size()) {
+		while (cnt[s[l]] > 1) {
+			--cnt[s[l]];
+			++l;
+		}
+		ans = min(ans, r - l);
+		if (r == s.size()) break;
+		++cnt[s[r]];
+		++r;
+	}
+
+	cout << ans << '\n';
+	return 0;
 }

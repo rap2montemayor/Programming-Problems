@@ -1,62 +1,63 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define ll long long
 
-ll m=1000000007;
+typedef long long ll;
+ll m = (1e9 + 7);
+vector<ll> fac(1e7, 1);
+vector<bool> isgood(1e7, true);
 
-bool isExcellent(int a, int b, int n, int alen) {
-    int res=a*alen + b*(n-alen);
-    while (res!=0) {
-        if (res%10 != a and res%10 != b)
-            return false;
-        res/=10;
-    }
-    return true;
+ll modpow(ll n, ll x) {
+	if (n == 1 or x == 0) return 1;
+	if (x == 1) return n;
+
+	ll res = 1;
+	n %= m;
+	while (x > 0) {
+		if (x % 2 == 1) res = (res*n) % m;
+		x /= 2;
+		n = (n*n) % m;
+	}
+	return res % m;
 }
 
-ll factorial(ll n) {
-    if (n==1) return n;
-    ll ans=1;
-    for (int i=2; i<=n; i++) ans = (ans%m*i%m)%m;
-    return ans;
+ll inverse(ll n) {
+	return modpow(n, m - 2);
 }
 
-ll pow(ll n, ll x) {
-    if (n==1 or x==0) return 1;
-    if (x==1) return n;
-
-    int ans=1;
-    while (x>0) {
-        if (x%2==1) {
-            ans = (ans%m*n%m)%m;
-            x--;
-        }
-        ans = (ans%m*ans%m)%m;
-        x/=2;
-    }
-
-    return ans;
-}
-
-ll combination(ll n, ll r) {
-    ll num = factorial(n);
-    ll denom = (factorial(r)%m * factorial(n-r)%m)%m;
-
-    return (num*pow(denom,m-2))%m;
-    //return num/denom;
+ll comb(ll n, ll r) {
+	if (n == r or n == 0) return 1;
+	ll num = fac[n];
+	ll denom = (fac[r] * fac[n-r]) % m;
+	return (num * inverse(denom)) % m;
 }
 
 int main() {
-    ll a,b,n;
-    cin>>a>>b>>n;
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL); cout.tie(NULL);
 
-    ll ans=0;
-    for (int i=0; i<=n; i++) {
-        if (isExcellent(a,b,n,i)) {
-            ans+=combination(n,i);
-            ans%=m;
-        }
-    }
-    cout << ans << endl;
-    return 0;
+	ll a, b, n; cin >> a >> b >> n;
+
+	for (ll i = 1; i < 1e7; ++i) {
+		fac[i] = (i * fac[i-1]) % m;
+
+		ll n = i;
+		while (n >= 1) {
+			if (n % 10 != a and n % 10 != b) {
+				isgood[i] = false;
+				break;
+			}
+			n /= 10;
+		}
+	}
+
+	ll ans = 0;
+	for (ll acnt = 0; acnt <= n; ++acnt) {
+		ll bcnt = n - acnt;
+		ll sum = acnt*a + bcnt*b;
+		if (isgood[sum])
+			ans = (ans + comb(n, acnt)) % m;
+	}
+
+	cout << ans << '\n';
+	return 0;
 }
